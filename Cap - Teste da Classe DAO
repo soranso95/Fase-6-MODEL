@@ -1,0 +1,20 @@
+public class FintechTest {
+    public static void main(String[] args) {
+        ClienteDAO clienteDao = new ClienteDAO();
+
+        try {
+            // Inserir clientes
+            clienteDao.insertCliente("Jose Santos", "Alameda Santos 1521", "jose@gmail.com", "1191234-5678");
+            clienteDao.insertCliente("Paloma Oliveira", "Barretos 58", "paloma@gmail.com.com", "1198765-4321");
+
+            // Consultar todos os clientes
+            ResultSet rs = clienteDao.getAllClientes();
+            while (rs.next()) {
+                System.out.println("Nome: " + rs.getString("nm_cliente") + ", Email: " + rs.getString("ds_email"));
+            }
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
