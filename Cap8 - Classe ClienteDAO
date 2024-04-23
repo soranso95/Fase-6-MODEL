@@ -1,0 +1,22 @@
+import java.sql.*;
+
+public class ClienteDAO {
+    public void insertCliente(String nome, String endereco, String email, String telefone) throws SQLException {
+        String sql = "INSERT INTO CLIENTE (nm_cliente, ds_endereco, ds_email, nr_telefone) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, nome);
+            pstmt.setString(2, endereco);
+            pstmt.setString(3, email);
+            pstmt.setString(4, telefone);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public ResultSet getAllClientes() throws SQLException {
+        String sql = "SELECT * FROM CLIENTE";
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        return pstmt.executeQuery();
+    }
+}
