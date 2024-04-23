@@ -1,0 +1,99 @@
+CADASTRO E ALTERAÇÃO:
+
+-- Cadastrar os dados do usuário
+INSERT INTO CLIENTE (id_cliente, nm_cliente, ds_endereco, ds_email, nr_telefone)
+VALUES (idClienteSeq.NEXTVAL, 'Nome do Cliente', 'Endereço', 'Email', 'Telefone');
+
+-- Cadastrar os dados para a conta do usuário
+INSERT INTO CONT_BANC (n_conta, CLIENTE_id_cliente, ds_saldo, ds_�po)
+VALUES ('Número da Conta', idCliente, saldoInicial, 'Tipo da Conta');
+
+-- Alterar todos os dados do usuário, u�lizando seu código como referência
+UPDATE CLIENTE
+SET nm_cliente = 'Novo Nome', ds_endereco = 'Novo Endereço', ds_email = 'Novo Email', 
+nr_telefone = 'Novo Telefone'
+WHERE id_cliente = idCliente;
+
+-- Cadastrar as receitas do usuário
+INSERT INTO RECEITAS (id_receita, CLIENTE_id_cliente, vl_receita, dt_receita, ds_categoria, 
+ds_descricao)
+VALUES (idReceitaSeq.NEXTVAL, idCliente, valorReceita, SYSDATE, 'Categoria Receita', 
+'Descrição Receita');
+
+-- Alterar todos os dados das receitas do usuário, u�lizando o código como referência
+UPDATE RECEITAS
+SET vl_receita = novoValorReceita, dt_receita = novaDataReceita, ds_categoria = 'Nova 
+Categoria', ds_descricao = 'Nova Descrição'
+WHERE id_receita = idReceita AND CLIENTE_id_cliente = idCliente;
+
+-- Cadastrar as despesas do usuário
+INSERT INTO DESPESAS (id_despesa, CLIENTE_id_cliente, vl_despesa, dt_despesa, 
+ds_categoria, ds_descricao)
+VALUES (idDespesaSeq.NEXTVAL, idCliente, valorDespesa, SYSDATE, 'Categoria Despesa', 
+'Descrição Despesa');
+
+-- Alterar todos os dados das despesas do usuário, u�lizando o código como referência
+UPDATE DESPESAS
+SET vl_despesa = novoValorDespesa, dt_despesa = novaDataDespesa, ds_categoria = 'Nova 
+Categoria', ds_descricao = 'Nova Descrição'
+WHERE id_despesa = idDespesa AND CLIENTE_id_cliente = idCliente;
+
+-- Cadastrar os dados para inves�mentos
+INSERT INTO INVESTIMENTOS (id_inves�mento, CLIENTE_id_cliente, ds_�po, vl_inves�do, 
+dt_aplicacao)
+VALUES (idInves�mentoSeq.NEXTVAL, idCliente, 'Tipo de Inves�mento', valorInves�do, 
+SYSDATE);
+
+-- Alterar todos os dados para inves�mentos do usuário, u�lizando o código como referência
+UPDATE INVESTIMENTOS
+SET ds_�po = 'Novo Tipo', vl_inves�do = novoValorInves�do, dt_aplicacao = 
+novaDataAplicacao
+WHERE id_inves�mento = idInves�mento AND CLIENTE_id_cliente = idCliente;
+CONSULTAS:
+
+-- Consultar os dados de um usuário (filtrar a par�r do seu código)
+SELECT * FROM CLIENTE WHERE id_cliente = idCliente;
+-- Consultar os dados de um único registro de despesa de um usuário (filtrar a par�r 
+do código do usuário e do código da despesa)
+SELECT * FROM DESPESAS WHERE CLIENTE_id_cliente = idCliente AND id_despesa = 
+idDespesa;
+
+-- Consultar os dados de todos os registros de despesas de um usuário, ordenando-os 
+dos registros mais recentes para os mais an�gos (filtrar a par�r do seu código)
+SELECT * FROM DESPESAS WHERE CLIENTE_id_cliente = idCliente ORDER BY 
+dt_despesa DESC;
+
+-- Consultar os dados de um único registro de inves�mento de um usuário (filtrar a 
+par�r do código do usuário e do código de inves�mento)
+SELECT * FROM INVESTIMENTOS WHERE CLIENTE_id_cliente = idCliente AND 
+id_inves�mento = idInves�mento;
+-- Consultar os dados de todos os registros de inves�mentos de um usuário, 
+ordenando-os dos registros mais recentes para os mais an�gos (filtrar a par�r do seu 
+código)
+SELECT * FROM INVESTIMENTOS WHERE CLIENTE_id_cliente = idCliente ORDER BY 
+dt_aplicacao DESC;
+-- Consultar os dados básicos de um usuário, o úl�mo inves�mento registrado e a 
+úl�ma despesa registrada (filtrar a par�r do código de usuário – consulta necessária 
+para o dashboard)
+
+SELECT 
+ c.*,
+ i.ds_�po AS ul�mo_�po_investimento,
+ d.ds_categoria AS ul�ma_categoria_despesa
+FROM CLIENTE c
+
+LEFT JOIN (
+ SELECT CLIENTE_id_cliente, ds_�po
+ FROM INVESTIMENTOS
+ WHERE CLIENTE_id_cliente = c.id_cliente
+ ORDER BY dt_aplicacao DESC
+ FETCH FIRST ROW ONLY
+) i ON c.id_cliente = i.CLIENTE_id_cliente
+LEFT JOIN (
+ SELECT CLIENTE_id_cliente, ds_categoria
+ FROM DESPESAS
+ WHERE CLIENTE_id_cliente = c.id_cliente
+ ORDER BY dt_despesa DESC
+ FETCH FIRST ROW ONLY
+) d ON c.id_cliente = d.CLIENTE_id_cliente
+WHERE c.id_cliente = idCliente;
