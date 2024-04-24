@@ -1,13 +1,28 @@
+package com.fintech;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
-    public static Connection getConnection() throws SQLException {
-        // Necessario alterar usuario e senha para teste
-        String url = "jdbc:oracle:thin:@oracle.fiap.com.br:1521/ORQL";
-        String user = "RM123456";
-        String password = "123456";
-        return DriverManager.getConnection(url, user, password);
+    public static void main(String[] args) {
+
+        Connection conn = getConnection();
+        if (conn != null) {
+            System.out.println("Conexão estabelecida com sucesso!");
+        }
+    }
+
+    public static Connection getConnection() {
+        try {
+            String url = "jdbc:oracle:thin:@oracle.fiap.com.br:1521/ORQL";
+            String user = "RM123456";
+            String password = "123456";
+            Connection conn = DriverManager.getConnection(url, user, password);
+            return conn; // Retorna a conexão se bem sucedida
+        } catch (SQLException e) {
+            System.out.println("Erro ao conectar: " + e.getMessage());
+            return null; // Retorna null se houver uma falha
+        }
     }
 }
