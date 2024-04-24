@@ -1,13 +1,14 @@
-package com.fintech;
+package com.fintech.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import com.fintech.util.DatabaseConnection;
 
-public class ClienteDAO {
+public class FintechDAO {
 
-    // Método para inserir um cliente no banco de dados
+    // Método para inserir um novo cliente
     public void insertCliente(String nome, String endereco, String email, String telefone) throws SQLException {
         String sql = "INSERT INTO CLIENTE (nm_cliente, ds_endereco, ds_email, nr_telefone) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -17,29 +18,23 @@ public class ClienteDAO {
             pstmt.setString(3, email);
             pstmt.setString(4, telefone);
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Erro ao inserir cliente: " + e.getMessage());
+            // Re-lança a exceção para permitir que o chamador lide com ela
+            throw e;
         }
     }
 
-    // Método para obter todos os clientes do banco de dados
+    // Método para recuperar todos os clientes
     public ResultSet getAllClientes() throws SQLException {
         String sql = "SELECT * FROM CLIENTE";
-        Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        return pstmt.executeQuery();
-    }
-
-    // Método main para executar alguns testes
-    public static void main(String[] args) {
-        ClienteDAO dao = new ClienteDAO();
-        try {
-            dao.insertCliente("Jose Santos", "Alameda Santos 1521", "jose@gmail.com", "1191234-5678");
-            ResultSet rs = dao.getAllClientes();
-            while (rs.next()) {
-                System.out.println("Nome: " + rs.getString("nm_cliente") + ", Email: " + rs.getString("ds_email"));
-            }
-            rs.close();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            return pstmt.executeQuery();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Erro ao buscar clientes: " + e.getMessage());
+            // Re-lança a exceção para permitir que o chamador lide com ela
+            throw e;
         }
     }
 }
