@@ -1,6 +1,13 @@
-import java.sql.*;
+package com.fintech;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ClienteDAO {
+
+    // Método para inserir um cliente no banco de dados
     public void insertCliente(String nome, String endereco, String email, String telefone) throws SQLException {
         String sql = "INSERT INTO CLIENTE (nm_cliente, ds_endereco, ds_email, nr_telefone) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -13,10 +20,26 @@ public class ClienteDAO {
         }
     }
 
+    // Método para obter todos os clientes do banco de dados
     public ResultSet getAllClientes() throws SQLException {
         String sql = "SELECT * FROM CLIENTE";
         Connection conn = DatabaseConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(sql);
         return pstmt.executeQuery();
+    }
+
+    // Método main para executar alguns testes
+    public static void main(String[] args) {
+        ClienteDAO dao = new ClienteDAO();
+        try {
+            dao.insertCliente("Jose Santos", "Alameda Santos 1521", "jose@gmail.com", "1191234-5678");
+            ResultSet rs = dao.getAllClientes();
+            while (rs.next()) {
+                System.out.println("Nome: " + rs.getString("nm_cliente") + ", Email: " + rs.getString("ds_email"));
+            }
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
