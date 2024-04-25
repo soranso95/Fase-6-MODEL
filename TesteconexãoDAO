@@ -1,0 +1,55 @@
+package com.fintech.dao;
+
+import com.fintech.model.Transacao;
+import com.fintech.DatabaseConnection;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class TransacaoDAO {
+
+    public void insertTransacao(Transacao transacao) {
+        String sql = "INSERT INTO TRANSACAO (id_transacao, CONT_BANC_CLIENTE_id_cliente, CONT_BANC_n_conta, dt_transacao, vl_transacao, ds_tipo) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, transacao.getIdTransacao());
+            pstmt.setInt(2, transacao.getClienteId());
+            pstmt.setInt(3, transacao.getContaBancaria());
+            pstmt.setDate(4, new java.sql.Date(transacao.getDataTransacao().getTime()));
+            pstmt.setDouble(5, transacao.getValorTransacao());
+            pstmt.setString(6, transacao.getTipoTransacao());
+            
+            pstmt.executeUpdate();
+            System.out.println("Transação inserida com sucesso.");
+        } catch (SQLException e) {
+            System.err.println("Erro ao inserir transação: " + e.getMessage());
+        }
+    }
+
+    public List<Transacao> getAllTransacoes() {
+        List<Transacao> transacoes = new ArrayList<>();
+        String sql = "SELECT * FROM TRANSACAO";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            
+            while (rs.next()) {
+                Transacao transacao = new Transacao();
+                transacao.setIdTransacao(rs.getInt("id_transacao"));
+                transacao.setClienteId(rs.getInt("CONT_BANC_CLIENTE_id_cliente"));
+                transacao.setContaBancaria(rs.getInt("CONT_BANC_n_conta"));
+                transacao.setDataTransacao(rs.getDate("dt_transacao"));
+                transacao.setValorTransacao(rs.getDouble("vl_transacao"));
+                transacao.setTipoTransacao(rs.getString("ds_tipo"));
+                
+                transacoes.add(transacao);
+            }
+            System.out.println("Transações recuperadas com sucesso.");
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar transações: " + e.getMessage());
+        }
+        return transacoes;
+    }
+}
